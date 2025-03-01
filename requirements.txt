@@ -3,3 +3,5 @@ pillow
 ollama
 pyyaml 
 requests
+flask
+gunicorn

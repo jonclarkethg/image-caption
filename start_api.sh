@@ -16,8 +16,8 @@ echo "Checking for existing processes on ports 5000 and 5001..."
 lsof -ti:5000 | xargs kill -9 2>/dev/null || true
 lsof -ti:5001 | xargs kill -9 2>/dev/null || true
 
-# Start the API server in mock mode
-echo "Starting API server in mock mode..."
+# Start the API server in production mode with Gunicorn
+echo "Starting API server in production mode with 4 workers..."
 export PORT=5001
 export MOCK_MODE=False
-python "${SCRIPT_DIR}/app.py"
+cd "${SCRIPT_DIR}" && gunicorn -w 4 -b 0.0.0.0:5001 app:app

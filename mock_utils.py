@@ -34,11 +34,24 @@ def mock_process_image_url(image_url, model_name, context=None, debug=False):
         "chatgpt-4o-latest": "A fluffy orange cat with bright green eyes looking directly at the camera.",
         "claude-3-sonnet": "Orange tabby cat with green eyes in close-up portrait.",
         "llava-13b": "Cat with orange fur staring at viewer.",
-        "pixtral-12b": "Close-up of an orange tabby cat with striking green eyes."
+        "pixtral-12b": "Close-up of an orange tabby cat with striking green eyes.",
+        "gemini-pro-vision": "Orange cat with emerald eyes in detailed portrait."
+    }
+    
+    # Mock providers based on model name
+    providers = {
+        "chatgpt-4o-latest": "openai",
+        "claude-3-sonnet": "anthropic",
+        "llava-13b": "ollama",
+        "pixtral-12b": "mistral",
+        "gemini-pro-vision": "vertexai"
     }
     
     # Use the caption for the specified model, or a default one
     alt_text = captions.get(model_name, "A close-up photograph of an orange cat.")
+    
+    # Get the provider for the model
+    provider = providers.get(model_name, "unknown")
     
     # Add context influence if provided
     if context and "dog" in context.lower():
@@ -51,6 +64,7 @@ def mock_process_image_url(image_url, model_name, context=None, debug=False):
         "image_url": image_url,
         "alt_text": alt_text,
         "model": model_name,
+        "provider": provider,
         "processing_time": total_time,
         "model_time": processing_time
     }

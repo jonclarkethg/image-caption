@@ -22,6 +22,9 @@ def generate_alt_text():
         "context": "Optional context to improve caption accuracy"
     }
     
+    Query parameters:
+    vertexai=true - Use Vertex AI for processing instead of the default model provider
+    
     Returns:
     {
         "image_url": "https://example.com/image.jpg",
@@ -54,10 +57,16 @@ def generate_alt_text():
         context = data.get('context')
         debug = data.get('debug', False)
         
+        # Check if Vertex AI should be used
+        use_vertexai = request.args.get('vertexai', '').lower() == 'true'
+        
         # Process image (use mock in test mode)
         if MOCK_MODE:
             print(f"Using mock mode for processing: {image_url}")
             result = mock_utils.mock_process_image_url(image_url, model, context, debug)
+        elif use_vertexai:
+            print(f"Using Vertex AI for processing: {image_url}")
+            result = utils.process_image_url_with_vertexai(image_url, model, context, debug)
         else:
             result = utils.process_image_url(image_url, model, context, debug)
         
@@ -89,7 +98,8 @@ def list_models():
                 "installed": true
             },
             ...
-        ]
+        ],
+        "vertex_ai_enabled": true/false
     }
     """
     try:
@@ -123,6 +133,13 @@ def list_models():
                     "provider": "mistral",
                     "deployment": "cloud",
                     "installed": True
+                },
+                {
+                    "name": "gemini-pro-vision",
+                    "description": "Gemini Pro Vision",
+                    "provider": "vertexai",
+                    "deployment": "cloud",
+                    "installed": config.VERTEX_AI_PROJECT_ID != ''
                 }
             ]
         else:
@@ -132,15 +149,26 @@ def list_models():
             # Format response
             model_list = []
             for name, config in models.items():
+                # For Vertex AI models, check if project ID is set
+                installed = config.get('installed', False)
+                if config.get('provider') == 'vertexai':
+                    installed = installed and config.VERTEX_AI_PROJECT_ID != ''
+                
                 model_list.append({
                     "name": name,
                     "description": config.get('description', ''),
                     "provider": config.get('provider', 'unknown'),
                     "deployment": config.get('deployment', 'unknown'),
-                    "installed": config.get('installed', False)
+                    "installed": installed
                 })
         
-        return jsonify({"models": model_list}), 200
+        # Add Vertex AI enabled flag
+        response = {
+            "models": model_list,
+            "vertex_ai_enabled": config.VERTEX_AI_PROJECT_ID != '' and config.VERTEX_AI_REGION != ''
+        }
+        
+        return jsonify(response), 200
         
     except Exception as e:
         # Log the full error

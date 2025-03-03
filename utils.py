@@ -140,8 +140,8 @@ def validate_model(model_name, models):
         raise ValueError(f"Model '{model_name}' not found")
     
     model_config = models[model_name]
-    if not model_config.get('installed', False):
-        raise ValueError(f"Model '{model_name}' is not installed")
+    #if not model_config.get('installed', False):
+        #raise ValueError(f"Model '{model_name}' is not installed")
     
     return model_config
 
@@ -314,6 +314,72 @@ def process_image_url(image_url, model_name, context=None, debug=False):
     response = {
         "image_url": image_url,
         "model": model_name,
+        "provider": model_config.get("provider", "unknown"),
+        "processing_time": total_time
+    }
+    
+    if "error" in result and result["error"]:
+        response["error"] = result["caption"]
+    else:
+        response["alt_text"] = result["caption"]
+        response["model_time"] = result["time"]
+    
+    # Clean up temporary files
+    try:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        if small_image != image_path and os.path.exists(small_image):
+            os.remove(small_image)
+    except:
+        pass
+    
+    return response
+
+def process_image_url_with_vertexai(image_url, model_name, context=None, debug=False):
+    """Process an image from URL with Vertex AI.
+    
+    Args:
+        image_url (str): URL of the image to process
+        model_name (str): Name of the model to use
+        context (str, optional): Additional context for caption generation
+        debug (bool, optional): Whether to print debug information
+        
+    Returns:
+        dict: Result containing the generated caption and metadata
+    """
+    start_time = time.time()
+    
+    # Import Vertex AI utilities
+    import vertex_utils
+    
+    # Load models
+    models = load_models()
+    if not models:
+        raise ValueError("No models available")
+    
+    # Validate model
+    model_config = validate_model(model_name, models)
+    
+    # Download image
+    image_path = download_image(image_url)
+    
+    # Resize large images
+    small_image = resize_image(image_path)
+    
+    # Process image with Vertex AI
+    result = vertex_utils.process_image_with_vertexai(small_image, model_config, context, debug)
+    
+    # Add metadata
+    total_time = round(time.time() - start_time, 1)
+    
+    # Get the original provider from the model config
+    original_provider = model_config.get("provider", "unknown")
+    
+    response = {
+        "image_url": image_url,
+        "model": model_name,
+        "provider": "vertexai",  # Override provider to show it was processed by Vertex AI
+        "original_provider": original_provider,  # Include the original provider for reference
         "processing_time": total_time
     }
     

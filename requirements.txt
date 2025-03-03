@@ -1,7 +1,8 @@
 llm
 pillow
 ollama
-pyyaml 
+pyyaml
 requests
 flask
 gunicorn
+google-cloud-aiplatform>=1.36.0

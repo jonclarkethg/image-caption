@@ -2,11 +2,33 @@ claude-3-sonnet:
   deployment: cloud
   description: Claude 3 Sonnet
   model: anthropic/claude-3-sonnet-20240229
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
+  prompt: You are a helpful alt-text generator and SEO expert assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
   provider: anthropic
   settings:
     max_tokens: 75
     temperature: 0.1
+
+gemini-2-flash:
+  deployment: cloud
+  description: Gemini Pro Vision
+  model: publishers/google/models/gemini-2.0-pro-exp-02-05
+  prompt: You are a helpful alt-text generator and SEO expert assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
+  provider: vertexai
+  settings:
+    max_tokens: 75
+    temperature: 0.1
+    top_p: 0.7
+
+gemini-pro-vision:
+  deployment: cloud
+  description: Gemini Pro Vision
+  model: gemini-pro-vision
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
+  provider: vertexai
+  settings:
+    max_tokens: 75
+    temperature: 0.1
+    top_p: 0.7
 
 chatgpt-4o-latest:
   deployment: cloud
@@ -35,6 +57,7 @@ llava-13b:
   description: LLaVA (13B)
   model: llava:13b
   prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
+  provider: ollama
   settings:
     temperature: 0.1
     top_k: 40

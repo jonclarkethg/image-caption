@@ -19,5 +19,5 @@ lsof -ti:5001 | xargs kill -9 2>/dev/null || true
 # Start the API server in mock mode
 echo "Starting API server in mock mode..."
 export PORT=5001
-export MOCK_MODE=True
+export MOCK_MODE=False
 python "${SCRIPT_DIR}/app.py"

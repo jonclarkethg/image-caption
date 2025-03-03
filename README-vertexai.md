@@ -36,7 +36,6 @@ Edit the `start_api.sh` script to set your Google Cloud project details:
 export VERTEX_AI_PROJECT_ID="your-project-id"  # Replace with your actual project ID
 export VERTEX_AI_REGION="us-central1"          # Replace with your preferred region
 export VERTEX_AI_CREDENTIALS="${SCRIPT_DIR}/credentials.json"
-export VERTEX_AI_ENABLED=True                  # Set to True to enable Vertex AI by default
 ```
 
 ## Usage
@@ -51,10 +50,10 @@ Run the start_api.sh script to start the API server:
 
 ### Making Requests
 
-To use Vertex AI for image captioning, add the `vertexai=true` query parameter to your API requests:
+To use Vertex AI for image captioning, simply specify a model with "vertexai" as the provider in your API request:
 
 ```bash
-curl -X POST "http://localhost:5001/api/generate-alt-text?vertexai=true" \
+curl -X POST "http://localhost:5001/api/generate-alt-text" \
   -H "Content-Type: application/json" \
   -d '{
     "image_url": "https://example.com/image.jpg",
@@ -63,7 +62,7 @@ curl -X POST "http://localhost:5001/api/generate-alt-text?vertexai=true" \
   }'
 ```
 
-The `model` parameter in your request will be used with Vertex AI. You can specify any model that's configured in your models.yaml file. If the model is a Vertex AI model (provider: "vertexai"), it will be used directly. If it's not a Vertex AI model, the system will fall back to using "gemini-pro-vision" but will still use the prompt and settings from the specified model.
+The system automatically detects that "gemini-pro-vision" has a provider of "vertexai" in the models.yaml configuration and processes the image using Vertex AI.
 
 ### Response Format
 
@@ -80,20 +79,6 @@ The API response includes information about which provider was used to process t
 }
 ```
 
-When using Vertex AI with a non-Vertex AI model, the response will include both the provider ("vertexai") and the original provider:
-
-```json
-{
-  "image_url": "https://example.com/image.jpg",
-  "alt_text": "Generated caption for the image",
-  "model": "claude-3-sonnet",
-  "provider": "vertexai",
-  "original_provider": "anthropic",
-  "processing_time": 2.5,
-  "model_time": 1.8
-}
-```
-
 ### Available Models
 
 The API includes the Gemini Pro Vision model from Vertex AI. You can see all available models by making a GET request to the `/api/models` endpoint:
@@ -102,7 +87,25 @@ The API includes the Gemini Pro Vision model from Vertex AI. You can see all ava
 curl "http://localhost:5001/api/models"
 ```
 
-The response will include information about whether Vertex AI is enabled and which models are available.
+The response will include information about all available models and their providers.
+
+## Adding New Vertex AI Models
+
+To add a new Vertex AI model, update the `models.yaml` file with a new entry that has "vertexai" as the provider:
+
+```yaml
+new-vertexai-model:
+  deployment: cloud
+  description: New Vertex AI Model
+  model: new-model-name
+  prompt: Your prompt here...
+  provider: vertexai
+  settings:
+    max_tokens: 75
+    temperature: 0.1
+```
+
+The system will automatically use Vertex AI to process images when this model is specified.
 
 ## Troubleshooting
 
@@ -116,11 +119,11 @@ If you encounter authentication issues:
 
 ### Model Availability
 
-If the Gemini Pro Vision model is not available:
+If the Vertex AI models are not available:
 
 1. Check that the `VERTEX_AI_PROJECT_ID` and `VERTEX_AI_REGION` are set correctly
 2. Verify that the Vertex AI API is enabled for your project
-3. Ensure you have access to the Gemini Pro Vision model in your region
+3. Ensure you have access to the models in your region
 
 ### Debug Mode
 

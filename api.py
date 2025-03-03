@@ -22,14 +22,12 @@ def generate_alt_text():
         "context": "Optional context to improve caption accuracy"
     }
     
-    Query parameters:
-    vertexai=true - Use Vertex AI for processing instead of the default model provider
-    
     Returns:
     {
         "image_url": "https://example.com/image.jpg",
         "alt_text": "Generated alt text for the image.",
         "model": "chatgpt-4o-latest",
+        "provider": "openai",
         "processing_time": 2.5
     }
     
@@ -57,18 +55,29 @@ def generate_alt_text():
         context = data.get('context')
         debug = data.get('debug', False)
         
-        # Check if Vertex AI should be used
-        use_vertexai = request.args.get('vertexai', '').lower() == 'true'
-        
         # Process image (use mock in test mode)
         if MOCK_MODE:
             print(f"Using mock mode for processing: {image_url}")
             result = mock_utils.mock_process_image_url(image_url, model, context, debug)
-        elif use_vertexai:
-            print(f"Using Vertex AI for processing: {image_url}")
-            result = utils.process_image_url_with_vertexai(image_url, model, context, debug)
         else:
-            result = utils.process_image_url(image_url, model, context, debug)
+            # Load models to check the provider
+            models = utils.load_models()
+            if not models:
+                return jsonify({"error": "No models available", "status_code": 500}), 500
+            
+            # Check if the model exists
+            if model not in models:
+                return jsonify({"error": f"Model '{model}' not found", "status_code": 400}), 400
+            
+            # Get the provider from the model config
+            provider = models[model].get("provider", "").lower()
+            
+            # Use Vertex AI if the provider is "vertexai"
+            if provider == "vertexai":
+                print(f"Using Vertex AI for processing: {image_url} (provider: {provider})")
+                result = utils.process_image_url_with_vertexai(image_url, model, context, debug)
+            else:
+                result = utils.process_image_url(image_url, model, context, debug)
         
         # Check for errors
         if 'error' in result:
@@ -98,8 +107,7 @@ def list_models():
                 "installed": true
             },
             ...
-        ],
-        "vertex_ai_enabled": true/false
+        ]
     }
     """
     try:
@@ -162,10 +170,9 @@ def list_models():
                     "installed": installed
                 })
         
-        # Add Vertex AI enabled flag
+        # Create response
         response = {
-            "models": model_list,
-            "vertex_ai_enabled": config.VERTEX_AI_PROJECT_ID != '' and config.VERTEX_AI_REGION != ''
+            "models": model_list
         }
         
         return jsonify(response), 200

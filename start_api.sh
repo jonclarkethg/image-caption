@@ -22,9 +22,6 @@ export VERTEX_AI_PROJECT_ID="thg-media-vertexai-content"
 export VERTEX_AI_REGION="us-central1"
 export VERTEX_AI_CREDENTIALS="/Users/clarkej/thg-media-vertexai-content-74926fb82d4a.json"
 
-# Set to True to enable Vertex AI by default
-export VERTEX_AI_ENABLED=False
-
 # Start the API server in production mode with Gunicorn
 echo "Starting API server in production mode with 4 workers..."
 export PORT=5001

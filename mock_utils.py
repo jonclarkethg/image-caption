@@ -21,8 +21,19 @@ def mock_download_image(url):
     
     return temp_path
 
-def mock_process_image_url(image_url, model_name, context=None, debug=False):
-    """Mock function to simulate processing an image URL."""
+def mock_process_image_url(image_url, model_name, context=None, prompt=None, debug=False):
+    """Mock function to simulate processing an image URL.
+    
+    Args:
+        image_url (str): URL of the image to process
+        model_name (str): Name of the model to use
+        context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the default prompt
+        debug (bool, optional): Whether to print debug information
+        
+    Returns:
+        dict: Result containing the generated caption and metadata
+    """
     start_time = time.time()
     
     # Simulate processing delay
@@ -56,6 +67,19 @@ def mock_process_image_url(image_url, model_name, context=None, debug=False):
     # Add context influence if provided
     if context and "dog" in context.lower():
         alt_text = alt_text.replace("cat", "dog").replace("tabby", "golden")
+    
+    # Simulate custom prompt influence if provided
+    if prompt:
+        if debug:
+            print(f"Mock: Using custom prompt: {prompt}")
+        
+        # Simulate different caption based on prompt keywords
+        if "detailed" in prompt.lower():
+            alt_text = "A detailed view of " + alt_text.lower()
+        elif "simple" in prompt.lower():
+            alt_text = "Simple image of " + alt_text.split(" with ")[0].lower()
+        elif "artistic" in prompt.lower():
+            alt_text = "Artistic portrait of " + alt_text.lower()
     
     # Calculate total time
     total_time = round(time.time() - start_time, 1)

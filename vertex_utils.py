@@ -61,13 +61,14 @@ def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
-def process_image_with_vertexai(image_path, model_config, context=None, debug=False):
+def process_image_with_vertexai(image_path, model_config, context=None, prompt=None, debug=False):
     """Process an image using Vertex AI.
     
     Args:
         image_path (str): Path to the image file
         model_config (dict): Model configuration
         context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
         debug (bool, optional): Whether to print debug information
         
     Returns:
@@ -108,10 +109,13 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                         region=region,
                     )
                     
-                    # Prepare the prompt
-                    prompt = model_config["prompt"]
+                    # Use provided prompt or fall back to model_config prompt
+                    prompt_text = prompt or model_config["prompt"]
                     if context:
-                        prompt = f"Consider this context before analyzing the image: {context}\n\n{prompt}"
+                        prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+                    
+                    if debug and prompt:
+                        print(f"Using custom prompt instead of model prompt")
                     
                     # Load the image and convert to base64
                     with open(image_path, "rb") as f:
@@ -133,7 +137,7 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                             {
                                 "role": "user",
                                 "content": [
-                                    {"type": "text", "text": prompt},
+                                    {"type": "text", "text": prompt_text},
                                     {
                                         "type": "image",
                                         "source": {
@@ -176,10 +180,13 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                 # Load the model
                 model = GenerativeModel(model_name)
                 
-                # Prepare the prompt
-                prompt = model_config["prompt"]
+                # Use provided prompt or fall back to model_config prompt
+                prompt_text = prompt or model_config["prompt"]
                 if context:
-                    prompt = f"Consider this context before analyzing the image: {context}\n\n{prompt}"
+                    prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+                
+                if debug and prompt:
+                    print(f"Using custom prompt instead of model prompt")
                 
                 # Detect the image MIME type
                 mime_type = get_image_mime_type(image_path)
@@ -205,7 +212,7 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                 
                 # Generate content
                 response = model.generate_content(
-                    [prompt, Part.from_data(img_bytes, mime_type)],
+                    [prompt_text, Part.from_data(img_bytes, mime_type)],
                     generation_config={
                         "max_output_tokens": model_config.get("settings", {}).get("max_tokens", 75),
                         "temperature": model_config.get("settings", {}).get("temperature", 0.1),
@@ -251,10 +258,13 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                 # Load the model
                 model = GenerativeModel(vertex_model_name)
                 
-                # Prepare the prompt
-                prompt = model_config["prompt"]
+                # Use provided prompt or fall back to model_config prompt
+                prompt_text = prompt or model_config["prompt"]
                 if context:
-                    prompt = f"Consider this context before analyzing the image: {context}\n\n{prompt}"
+                    prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+                
+                if debug and prompt:
+                    print(f"Using custom prompt instead of model prompt")
                 
                 # Detect the image MIME type
                 mime_type = get_image_mime_type(image_path)
@@ -280,7 +290,7 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                 
                 # Generate content
                 response = model.generate_content(
-                    [prompt, Part.from_data(img_bytes, mime_type)],
+                    [prompt_text, Part.from_data(img_bytes, mime_type)],
                     generation_config={
                         "max_output_tokens": model_config.get("settings", {}).get("max_tokens", 75),
                         "temperature": model_config.get("settings", {}).get("temperature", 0.1),

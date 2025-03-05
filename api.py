@@ -19,7 +19,8 @@ def generate_alt_text():
     {
         "image_url": "https://example.com/image.jpg",
         "model": "chatgpt-4o-latest",
-        "context": "Optional context to improve caption accuracy"
+        "context": "Optional context to improve caption accuracy",
+        "prompt": "Optional custom prompt to use instead of the default prompt"
     }
     
     Returns:
@@ -53,6 +54,7 @@ def generate_alt_text():
         image_url = data['image_url']
         model = data['model']
         context = data.get('context')
+        prompt = data.get('prompt')
         debug = data.get('debug', False)
         
         # Process image (use mock in test mode)
@@ -75,9 +77,9 @@ def generate_alt_text():
             # Use Vertex AI if the provider is "vertexai"
             if provider == "vertexai":
                 print(f"Using Vertex AI for processing: {image_url} (provider: {provider})")
-                result = utils.process_image_url_with_vertexai(image_url, model, context, debug)
+                result = utils.process_image_url_with_vertexai(image_url, model, context, prompt, debug)
             else:
-                result = utils.process_image_url(image_url, model, context, debug)
+                result = utils.process_image_url(image_url, model, context, prompt, debug)
         
         # Check for errors
         if 'error' in result:

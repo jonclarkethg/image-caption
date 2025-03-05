@@ -193,8 +193,19 @@ def clean_caption(caption):
 
     return first_sentence + "."
 
-def run_llm_command(image_path, model_config, context=None, debug=False):
-    """Run llm command for a specific model and return the result."""
+def run_llm_command(image_path, model_config, context=None, prompt=None, debug=False):
+    """Run llm command for a specific model and return the result.
+    
+    Args:
+        image_path (str): Path to the image file
+        model_config (dict): Model configuration
+        context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
+        debug (bool, optional): Whether to print debug information
+        
+    Returns:
+        dict: Result containing the generated caption and metadata
+    """
     start_time = time.time()
     
     try:
@@ -204,13 +215,16 @@ def run_llm_command(image_path, model_config, context=None, debug=False):
         # Add attachment for image
         cmd.extend(["-a", str(image_path)])
         
-        # Build prompt with context if provided
-        prompt = model_config["prompt"]
+        # Use provided prompt or fall back to model_config prompt
+        prompt_text = prompt or model_config["prompt"]
         if context:
-            prompt = f"Consider this context before analyzing the image: {context}\n\n{prompt}"
+            prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+        
+        if debug and prompt:
+            print(f"Using custom prompt instead of model prompt")
         
         # Add prompt to command
-        cmd.append(prompt)
+        cmd.append(prompt_text)
         
         # Add any model-specific settings
         if "settings" in model_config:
@@ -274,13 +288,14 @@ def run_llm_command(image_path, model_config, context=None, debug=False):
             print(error_msg, file=sys.stderr)
         return {"caption": error_msg, "error": True}
 
-def process_image_url(image_url, model_name, context=None, debug=False):
+def process_image_url(image_url, model_name, context=None, prompt=None, debug=False):
     """Process an image from URL with the specified model.
     
     Args:
         image_url (str): URL of the image to process
         model_name (str): Name of the model to use
         context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
         debug (bool, optional): Whether to print debug information
         
     Returns:
@@ -306,7 +321,7 @@ def process_image_url(image_url, model_name, context=None, debug=False):
     small_image = resize_image(image_path)
     
     # Process image
-    result = run_llm_command(small_image, model_config, context, debug)
+    result = run_llm_command(small_image, model_config, context, prompt, debug)
     
     # Add metadata
     total_time = round(time.time() - start_time, 1)
@@ -335,13 +350,14 @@ def process_image_url(image_url, model_name, context=None, debug=False):
     
     return response
 
-def process_image_url_with_vertexai(image_url, model_name, context=None, debug=False):
+def process_image_url_with_vertexai(image_url, model_name, context=None, prompt=None, debug=False):
     """Process an image from URL with Vertex AI.
     
     Args:
         image_url (str): URL of the image to process
         model_name (str): Name of the model to use
         context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
         debug (bool, optional): Whether to print debug information
         
     Returns:
@@ -367,7 +383,7 @@ def process_image_url_with_vertexai(image_url, model_name, context=None, debug=F
     small_image = resize_image(image_path)
     
     # Process image with Vertex AI
-    result = vertex_utils.process_image_with_vertexai(small_image, model_config, context, debug)
+    result = vertex_utils.process_image_with_vertexai(small_image, model_config, context, prompt, debug)
     
     # Add metadata
     total_time = round(time.time() - start_time, 1)

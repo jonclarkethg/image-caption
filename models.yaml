@@ -127,7 +127,7 @@ minicpm-v:
   deployment: local
   description: MiniCPM-V
   model: minicpm-v
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
   provider: ollama
   settings:
     temperature: 0.1

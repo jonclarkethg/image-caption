@@ -19,7 +19,7 @@ lsof -ti:5001 | xargs kill -9 2>/dev/null || true
 # Set Vertex AI environment variables
 # Replace these values with your actual Google Cloud project details
 export VERTEX_AI_PROJECT_ID="thg-media-vertexai-content"
-export VERTEX_AI_REGION="us-central1"
+export VERTEX_AI_REGION="us-east5"
 export VERTEX_AI_CREDENTIALS="/Users/clarkej/thg-media-vertexai-content-74926fb82d4a.json"
 
 # Start the API server in production mode with Gunicorn

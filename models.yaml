@@ -11,9 +11,21 @@ claude-3-sonnet:
 claude-3-sonnet-vertex:
   deployment: cloud
   description: Claude 3 Sonnet
-  model: anthropic/claude-3-sonnet-20240229
+  model: claude-3-7-sonnet@20250219
   prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
   provider: vertexai
+  use_anthropic_vertex: true
+  settings:
+    max_tokens: 75
+    temperature: 0.1
+
+claude-3-5-haiku-vertex:
+  deployment: cloud
+  description: Claude 3.5 Haiku
+  model: claude-3-5-haiku@20241022
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
+  provider: vertexai
+  use_anthropic_vertex: true
   settings:
     max_tokens: 75
     temperature: 0.1
@@ -22,7 +34,7 @@ gemini-2-flash:
   deployment: cloud
   description: Gemini 2.0 Flash
   model: publishers/google/models/gemini-2.0-pro-exp-02-05
-  prompt:  "Instructions: 1. Generate a concise caption (10-20 words). 2. Focus on the main subject and action in the image. 3. Avoid mentioning background elements unless crucial for understanding the image's primary message. 4. Use simple, everyday language.5. Avoid overly descriptive or poetic words. Example: Image description: A golden retriever dog jumping to catch a frisbee in a park. Alt text: Dog leaping to catch a frisbee.   "
+  prompt:  You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words.
   provider: vertexai
   settings:
     max_tokens: 75

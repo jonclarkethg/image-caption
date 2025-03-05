@@ -14,8 +14,12 @@ import io
 import config
 import utils
 
-def initialize_vertexai():
-    """Initialize Vertex AI with project and location."""
+def initialize_vertexai(region=None):
+    """Initialize Vertex AI with project and location.
+    
+    Args:
+        region (str, optional): The GCP region to use. If None, uses the default from config.
+    """
     # Set credentials if provided
     if config.VERTEX_AI_CREDENTIALS:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.VERTEX_AI_CREDENTIALS
@@ -23,7 +27,7 @@ def initialize_vertexai():
     # Initialize Vertex AI
     aiplatform.init(
         project=config.VERTEX_AI_PROJECT_ID,
-        location=config.VERTEX_AI_REGION,
+        location=region or config.VERTEX_AI_REGION,
     )
 
 def get_image_mime_type(image_path):
@@ -72,13 +76,16 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
     start_time = time.time()
     
     try:
-        # Initialize Vertex AI
-        initialize_vertexai()
-        
-        # Get the model name from the configuration
+        # Get the model name and configuration details
         model_name = model_config.get("model")
         provider = model_config.get("provider", "").lower()
         use_anthropic_vertex = model_config.get("use_anthropic_vertex", False)
+        
+        # Get region from model_config if provider is vertexai, otherwise use default
+        region = model_config.get("region") if provider == "vertexai" else None
+        
+        # Initialize Vertex AI with the appropriate region
+        initialize_vertexai(region)
         
         if debug:
             print(f"Processing with Vertex AI model: {model_name}")
@@ -92,10 +99,13 @@ def process_image_with_vertexai(image_path, model_config, context=None, debug=Fa
                 try:
                     from anthropic import AnthropicVertex
                     
+                    # Get region from model_config or use default
+                    region = model_config.get("region") or config.VERTEX_AI_REGION
+                    
                     # Initialize AnthropicVertex client
                     client = AnthropicVertex(
                         project_id=config.VERTEX_AI_PROJECT_ID,
-                        region=config.VERTEX_AI_REGION,
+                        region=region,
                     )
                     
                     # Prepare the prompt

@@ -155,3 +155,13 @@ pixtral-large:
     max_tokens: 75
     temperature: 0.1
     top_p: 0.7
+
+gemini-2-flash-thg:
+  deployment: local
+  description: gemini-2.0-flash-001 (THG)
+  model: gemini-2.0-flash-001
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
+  provider: thg
+  settings:
+    max_tokens: 75
+    temperature: 0.1

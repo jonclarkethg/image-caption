@@ -78,6 +78,10 @@ def generate_alt_text():
             if provider == "vertexai":
                 print(f"Using Vertex AI for processing: {image_url} (provider: {provider})")
                 result = utils.process_image_url_with_vertexai(image_url, model, context, prompt, debug)
+            # Use LiteLLM API if the provider is "thg"
+            elif provider == "thg":
+                print(f"Using LiteLLM API for processing: {image_url} (provider: {provider})")
+                result = utils.process_image_url_with_litellm(image_url, model, context, prompt, debug)
             else:
                 result = utils.process_image_url(image_url, model, context, prompt, debug)
         

@@ -2,6 +2,7 @@ import os
 import requests
 import tempfile
 import uuid
+import base64
 from pathlib import Path
 from PIL import Image
 import yaml
@@ -413,5 +414,162 @@ def process_image_url_with_vertexai(image_url, model_name, context=None, prompt=
             os.remove(small_image)
     except:
         pass
+    
+    return response
+
+def process_image_url_with_litellm(image_url, model_name, context=None, prompt=None, debug=False):
+    """Process an image from URL with LiteLLM API.
+    
+    Args:
+        image_url (str): URL of the image to process
+        model_name (str): Name of the model to use
+        context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
+        debug (bool, optional): Whether to print debug information
+        
+    Returns:
+        dict: Result containing the generated caption and metadata
+    """
+    start_time = time.time()
+    
+    # Load models
+    models = load_models()
+    if not models:
+        raise ValueError("No models available")
+    
+    # Validate model
+    model_config = validate_model(model_name, models)
+    
+    # Download image
+    image_path = download_image(image_url)
+    
+    # Resize large images
+    small_image = resize_image(image_path)
+    
+    try:
+        # Convert image to base64
+        with open(small_image, "rb") as image_file:
+            base64_image = base64.b64encode(image_file.read()).decode("utf-8")
+        
+        # Use provided prompt or fall back to model_config prompt
+        prompt_text = prompt or model_config["prompt"]
+        if context:
+            prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+        
+        if debug and prompt:
+            print(f"Using custom prompt instead of model prompt")
+        
+        # Prepare the request payload for LiteLLM API
+        payload = {
+            "model": model_config["model"],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt_text},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "max_tokens": model_config.get("settings", {}).get("max_tokens", 75),
+            "temperature": model_config.get("settings", {}).get("temperature", 0.1)
+        }
+        
+        # Add any additional model-specific settings
+        for key, value in model_config.get("settings", {}).items():
+            if key not in ["max_tokens", "temperature"]:
+                payload[key] = value
+        
+        if debug:
+            print("\n" + "="*80)
+            print(f"Model: {model_config['model']}")
+            print(f"Image: {image_path}")
+            print(f"Using LiteLLM API: {config.LITELLM_API_BASE_URL}")
+            print("-"*80)
+        
+        # Prepare headers
+        headers = {
+            "Content-Type": "application/json"
+        }
+        
+        # Add API key and service account if provided
+        if config.LITELLM_API_KEY:
+            headers["Authorization"] = f"Bearer {config.LITELLM_API_KEY}"
+        
+        # Send request to LiteLLM API
+        response = requests.post(
+            f"{config.LITELLM_API_BASE_URL.rstrip('/')}/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        # Check for errors
+        response.raise_for_status()
+        
+        # Parse response
+        result_json = response.json()
+        
+        # Extract the caption
+        raw_caption = result_json["choices"][0]["message"]["content"]
+        caption = clean_caption(raw_caption)
+        
+        execution_time = round(time.time() - start_time, 1)
+        
+        if debug:
+            print(f"Generated caption with LiteLLM API ({execution_time}s):")
+            print(f"  Raw: {raw_caption}")
+            print(f"  Clean: {caption}")
+            print("="*80)
+        
+        result = {
+            "caption": caption,
+            "time": execution_time
+        }
+        
+    except requests.exceptions.RequestException as e:
+        error_msg = f"Error communicating with LiteLLM API: {str(e)}"
+        if debug:
+            print(error_msg, file=sys.stderr)
+        result = {"caption": error_msg, "error": True}
+    except Exception as e:
+        error_msg = str(e)
+        if debug:
+            print(f"Error processing image with LiteLLM API: {error_msg}", file=sys.stderr)
+        result = {"caption": error_msg, "error": True}
+    finally:
+        # Clean up temporary files
+        try:
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            if small_image != image_path and os.path.exists(small_image):
+                os.remove(small_image)
+        except:
+            pass
+    
+    # Add metadata
+    total_time = round(time.time() - start_time, 1)
+    
+    # Get the original provider from the model config
+    original_provider = model_config.get("provider", "unknown")
+    
+    response = {
+        "image_url": image_url,
+        "model": model_name,
+        "provider": "thg",  # Override provider to show it was processed by THG
+        "original_provider": original_provider,  # Include the original provider for reference
+        "processing_time": total_time
+    }
+    
+    if "error" in result and result["error"]:
+        response["error"] = result["caption"]
+    else:
+        response["alt_text"] = result["caption"]
+        response["model_time"] = result["time"]
     
     return response

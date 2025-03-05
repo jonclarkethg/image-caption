@@ -55,7 +55,9 @@ def mock_process_image_url(image_url, model_name, context=None, prompt=None, deb
         "claude-3-sonnet": "anthropic",
         "llava-13b": "ollama",
         "pixtral-12b": "mistral",
-        "gemini-pro-vision": "vertexai"
+        "gemini-pro-vision": "vertexai",
+        "claude-3-sonnet-thg": "thg",
+        "llama-3-70b-thg": "thg"
     }
     
     # Use the caption for the specified model, or a default one

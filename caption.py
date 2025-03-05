@@ -155,8 +155,22 @@ def resize_image(image_path: str, debug: bool = False, max_dimension: int = 1024
         img.save(temp_path, optimize=True)
         return str(temp_path)
     
-def process_image(image_path: str, models_to_use: dict, models_to_run: list,  args: argparse.Namespace) -> dict:
-    """Process an image with specified models sequentially."""
+def process_image(image_path: str, models_to_use: dict, models_to_run: list, args: argparse.Namespace) -> dict:
+    """Process an image with specified models sequentially.
+    
+    Args:
+        image_path (str): Path to the image file
+        models_to_use (dict): Dictionary of model configurations
+        models_to_run (list): List of model names to run
+        args (argparse.Namespace): Command line arguments including:
+            - context (str, optional): Additional context for caption generation
+            - prompt (str, optional): Custom prompt to use instead of the one in model_config
+            - debug (bool): Whether to print debug information
+            - time (bool): Whether to include execution time in output
+            
+    Returns:
+        dict: Results containing the generated captions for each model
+    """
     start_time = time.time()
     
     if args.debug:
@@ -172,7 +186,7 @@ def process_image(image_path: str, models_to_use: dict, models_to_run: list,  ar
     
     for model_name in models_to_run:
         model_config = models_to_use[model_name]
-        result = run_llm_command(small_image, model_config, args.context, args.debug)
+        result = run_llm_command(small_image, model_config, args.context, args.prompt, args.debug)
         
         if args.time:
             results["captions"][model_name] = result
@@ -189,15 +203,25 @@ def process_image(image_path: str, models_to_use: dict, models_to_run: list,  ar
     
     return results
 
-def run_llm_command(image_path: str, model_config: dict, context: str = None, debug: bool = False) -> dict:
+def run_llm_command(image_path: str, model_config: dict, context: str = None, prompt: str = None, debug: bool = False) -> dict:
     """Run llm command for a specific model and return the result.
     
     Uses subprocess instead of the Python API for model execution because:
-    1. Memory isolation - Each model runs in a separate process, preventing memory leaks 
+    1. Memory isolation - Each model runs in a separate process, preventing memory leaks
        from accumulating in the main process
-    2. Resource cleanup - Process termination ensures complete cleanup of model resources, 
+    2. Resource cleanup - Process termination ensures complete cleanup of model resources,
        especially important with large vision models
     3. Fault isolation - A model crash only affects its own process
+    
+    Args:
+        image_path (str): Path to the image file
+        model_config (dict): Model configuration
+        context (str, optional): Additional context for caption generation
+        prompt (str, optional): Custom prompt to use instead of the one in model_config
+        debug (bool, optional): Whether to print debug information
+        
+    Returns:
+        dict: Result containing the generated caption and metadata
     """
     start_time = time.time()
     
@@ -208,13 +232,16 @@ def run_llm_command(image_path: str, model_config: dict, context: str = None, de
         # Add attachment for image
         cmd.extend(["-a", str(image_path)])
         
-        # Build prompt with context if provided
-        prompt = model_config["prompt"]
+        # Use provided prompt or fall back to model_config prompt
+        prompt_text = prompt or model_config["prompt"]
         if context:
-            prompt = f"Consider this context before analyzing the image: {context}\n\n{prompt}"
+            prompt_text = f"Consider this context before analyzing the image: {context}\n\n{prompt_text}"
+        
+        if debug and prompt:
+            print(f"Using custom prompt instead of model prompt")
         
         # Add prompt to command
-        cmd.append(prompt)
+        cmd.append(prompt_text)
         
         # Add any model-specific settings
         if "settings" in model_config:
@@ -300,6 +327,11 @@ def main():
         "--context",
         type=str,
         help="Additional context to help generate more accurate captions (e.g., title, location, date)"
+    )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        help="Custom prompt to use instead of the default prompt in the model configuration"
     )
     
     args = parser.parse_args()

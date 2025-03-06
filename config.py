@@ -21,7 +21,7 @@ VERTEX_AI_CREDENTIALS = os.environ.get('VERTEX_AI_CREDENTIALS', '')
 
 # LiteLLM API settings
 LITELLM_API_BASE_URL = os.environ.get('LITELLM_API_BASE_URL', 'https://thgai.io.thehut.local/')
-LITELLM_API_KEY = os.environ.get('LITELLM_API_KEY', 'sk-R5hJzjPpwMl4L63q21OYSw')  # API key for authentication
+LITELLM_API_KEY = os.environ.get('LITELLM_API_KEY', '')  # API key for authentication
 
 # Ensure temp directory exists
 os.makedirs(TEMP_DIR, exist_ok=True)

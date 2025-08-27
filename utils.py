@@ -506,7 +506,8 @@ def process_image_url_with_litellm(image_url, model_name, context=None, prompt=N
             f"{config.LITELLM_API_BASE_URL.rstrip('/')}/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=30,
+            verify=False
         )
         
         # Check for errors

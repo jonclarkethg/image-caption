@@ -1,9 +1,6 @@
-llm
+google-genai
 pillow
-ollama
 pyyaml
 requests
 flask
 gunicorn
-google-cloud-aiplatform>=1.36.0
-anthropic[vertex]

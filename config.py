@@ -14,14 +14,8 @@ MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
 TEMP_DIR = os.environ.get('TEMP_DIR', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp'))
 
-# Vertex AI settings
-VERTEX_AI_PROJECT_ID = os.environ.get('VERTEX_AI_PROJECT_ID', '')
-VERTEX_AI_REGION = os.environ.get('VERTEX_AI_REGION', 'us-central1')
-VERTEX_AI_CREDENTIALS = os.environ.get('VERTEX_AI_CREDENTIALS', '')
-
-# LiteLLM API settings
-LITELLM_API_BASE_URL = os.environ.get('LITELLM_API_BASE_URL', 'https://thgai.io.thehut.local/')
-LITELLM_API_KEY = os.environ.get('LITELLM_API_KEY', '')  # API key for authentication
+# Google AI API key
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', '')
 
 # Ensure temp directory exists
 os.makedirs(TEMP_DIR, exist_ok=True)

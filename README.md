@@ -1,153 +1,112 @@
-# Image caption generator
+# Image Caption API
 
-This Python script generates image captions using different large language models through Simon Willison's `llm` CLI tool.
+Generate alt text for images using Google Gemini models via the `google-genai` library.
 
-# Prerequisites
+## Prerequisites
 
-1. Python 3.x
-2. Ollama (for local models):
+- Python 3.x
+- A Google AI API key ([get one here](https://aistudio.google.com/apikey))
+
+## Installation
+
+1. Create and activate a virtual environment:
    ```bash
-   brew install ollama
+   python3 -m venv .
+   source bin/activate
    ```
 
-# Installation steps
-
-1. Install uv:
+2. Install dependencies:
    ```bash
-   pip install -U uv
+   pip install -r requirements.txt
    ```
 
-2. Create a virtual environment:
+3. Set your API key (or add a default in `config.py`):
    ```bash
-   uv venv 
+   export GOOGLE_API_KEY="your-api-key"
    ```
 
-3. Install llm and verify path:
-   ```bash
-   uv pip install -r requirements.txt
-   ```
-
-4. Activate the virtual environment:
-   ```bash
-   source .venv/bin/activate
-   ```
-
-4. Install LLM plugins:
-   ```bash
-   # Local models via Ollama
-   uv pip install llm-ollama
-
-   # Anthropic Claude models
-   uv pip install llm-anthropic
-
-   # Mistral models
-   uv pip install llm-mistral
-   ```
-
-5. Pull required local models:
-   ```bash
-   ollama pull llava:13b
-   ollama pull llava:34b
-   ollama pull llava-llama3
-   ollama pull llama3.2-vision:11b-instruct-q8_0
-   ollama pull minicpm-v
-   ```
-
-# Upgrading
-
-To upgrade llm and its plugins:
-```bash
-uv pip install -U llm
-uv pip install -U llm-ollama llm-anthropic llm-mistral
-```
-
-### Configure API keys
-
-Set up API keys for cloud-based models:
+## Quick start
 
 ```bash
-# OpenAI (for GPT-4 Vision)
-llm keys set openai
-
-# Anthropic (for Claude)
-llm keys set anthropic
-
-# Mistral (for Pixtral models)
-llm keys set mistral
+./start_api.sh
 ```
 
-## Supported models
+The server starts on http://localhost:5001 with 4 Gunicorn workers.
 
-This tool supports all vision and multi-modal models available through the `llm` CLI tool. The `models.yaml` file configures model-specific parameters like prompts, temperature and token limits. While several models are pre-configured, you can add any model supported by `llm` by adding its configuration to `models.yaml`. 
+## Available models
 
-### Cloud models
+Configured in `models.yaml`:
 
-- Claude 3 Sonnet (Anthropic) - anthropic/claude-3-sonnet-20240229
-- GPT-4 Vision (OpenAI) - chatgpt-4o-latest
-- Pixtral 12B (Mistral) - mistral/pixtral-12b-latest
-- Pixtral Large (Mistral) - mistral/pixtral-large-latest
+| Model | Description |
+|-------|-------------|
+| `gemini-2.5-flash-lite` | Fastest, cheapest (~$0.03 per 1K images) |
+| `gemini-2.5-flash` | Better quality (~$0.06 per 1K images) |
+| `gemini-3.1-flash-lite-preview` | Latest generation (~$0.10 per 1K images) |
 
-### Local models (via Ollama)
+## API endpoints
 
-- LLaVA 13B - llava:13b
-- LLaVA 34B - llava:34b
-- LLaVA Llama3 - llava-llama3
-- Llama 3.2 Vision (11B) - llama3.2-vision:11b-instruct-q8_0
-- MiniCPM-V - minicpm-v
+### Generate alt text
 
-
-## Usage
-
-List available models:
 ```bash
-./caption.py --list
+curl -X POST http://localhost:5001/api/generate-alt-text \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_url": "https://example.com/image.jpg",
+    "model": "gemini-2.5-flash-lite"
+  }'
 ```
 
-Generate captions using all models:
-```bash
-./caption.py path/to/image.jpg
-```
-
-Use specific models:
-```bash
-./caption.py path/to/image.jpg --model chatgpt-4o-latest pixtral-12b
-```
-
-Add context to improve caption accuracy:
-```bash
-./caption.py path/to/image.jpg --context "Photo taken at DrupalCon Barcelona 2024"
-./caption.py path/to/image.jpg --context "Location: Isle of Skye, Scotland"
-```
-
-Additional options:
-```bash
---context  # Add contextual information to improve caption accuracy
---time     # Include execution time in output
---debug    # Show detailed debug information
-```
-
-## Output format
-
-Standard output:
+Response:
 ```json
 {
-  "image": "path/to/image.jpg",
-  "captions": {
-    "model-name": "Generated caption.",
-    "another-model": "Another caption."
+  "image_url": "https://example.com/image.jpg",
+  "alt_text": "A golden retriever running through a grassy field.",
+  "model": "gemini-2.5-flash-lite",
+  "provider": "google",
+  "processing_time": 2.3,
+  "model_time": 1.9,
+  "cost": {
+    "input_tokens": 324,
+    "output_tokens": 21,
+    "thinking_tokens": 0,
+    "cached_tokens": 0,
+    "total_cost": 3.06e-05
   }
 }
 ```
 
-With timing information (`--time` flag):
-```json
-{
-  "image": "path/to/image.jpg",
-  "captions": {
-    "model-name": {
-      "caption": "Generated caption.",
-      "time": 2
-    }
-  }
-}
+Optional fields in the request body:
+- `context` — additional context to improve caption accuracy
+- `prompt` — custom prompt to override the default
+- `debug` — set to `true` for debug logging
+
+### List models
+
+```bash
+curl http://localhost:5001/api/models
+```
+
+### Health check
+
+```bash
+curl http://localhost:5001/api/health
+```
+
+## Configuration
+
+Environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GOOGLE_API_KEY` | (from config.py) | Google AI API key |
+| `PORT` | `5000` | Server port |
+| `HOST` | `0.0.0.0` | Server bind address |
+| `DEBUG` | `False` | Enable Flask debug mode |
+| `MOCK_MODE` | `False` | Use mock responses (no API calls) |
+| `TEMP_DIR` | `./temp` | Temporary file directory |
+
+## Testing
+
+```bash
+python test_api.py "https://example.com/image.jpg" --model gemini-2.5-flash-lite
 ```

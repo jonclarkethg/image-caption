@@ -1,176 +1,18 @@
-claude-3-sonnet:
-  deployment: cloud
-  description: Claude 3 Sonnet
-  model: anthropic/claude-3-sonnet-20240229
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: anthropic
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-
-claude-3-sonnet-vertex:
-  deployment: cloud
-  description: Claude 3 Sonnet
-  model: claude-3-7-sonnet@20250219
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
-  provider: vertexai
-  region: us-east5
-  use_anthropic_vertex: true
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-
-claude-3-5-haiku-vertex:
-  deployment: cloud
-  description: Claude 3.5 Haiku
-  model: claude-3-5-haiku@20241022
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: vertexai
-  region: us-east5
-  use_anthropic_vertex: true
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-
-gemini-2-flash:
-  deployment: cloud
-  description: Gemini 2.0 Flash
-  model: publishers/google/models/gemini-2.0-pro-exp-02-05
-  prompt:  You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: vertexai
-  region: us-central1
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-gemini-2-flash-lite:
-  deployment: cloud
-  description: Gemini 2.0 Flash Lite
-  model: publishers/google/models/gemini-2.0-flash-lite-001
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: vertexai
-  region: us-central1
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-gemini-pro-vision:
-  deployment: cloud
-  description: Gemini Pro Vision
-  model: gemini-pro-vision
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: vertexai
-  region: us-east5
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-chatgpt-4o-latest:
-  deployment: cloud
-  description: GPT-4 with Vision
-  model: chatgpt-4o-latest
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: openai
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-llama-vision:
+gemini-2-flash-lite-thg:
   deployment: local
-  description: Llama 3.2 Vision (11B)
-  model: llama3.2-vision:11b-instruct-q8_0
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: ollama
-  settings:
-    temperature: 0.1
-    top_k: 40
-    top_p: 0.7
-
-llava-13b:
-  deployment: local
-  description: LLaVA (13B)
-  model: llava:13b
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: ollama
-  settings:
-    temperature: 0.1
-    top_k: 40
-    top_p: 0.7
-
-llava-34b:
-  deployment: local
-  description: LLaVA (34B)
-  model: llava:34b
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: ollama
-  settings:
-    temperature: 0.1
-    top_k: 40
-    top_p: 0.7
-
-llava-llama3:
-  deployment: local
-  description: LLaVa Llama3
-  model: llava-llama3
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: ollama
-  settings:
-    temperature: 0.1
-    top_k: 40
-    top_p: 0.7
-
-minicpm-v:
-  deployment: local
-  description: MiniCPM-V
-  model: minicpm-v
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
-  provider: ollama
-  settings:
-    temperature: 0.1
-    top_k: 40
-    top_p: 0.7
-
-pixtral-12b:
-  deployment: cloud
-  description: Pixtral 12B
-  model: mistral/pixtral-12b-latest
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: mistral
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-pixtral-large:
-  deployment: cloud
-  description: Pixtral Large
-  model: mistral/pixtral-large-latest
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names..
-  provider: mistral
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-    top_p: 0.7
-
-gemini-2-flash-thg:
-  deployment: local
-  description: gemini-2.0-flash-001 (THG)
-  model: gemini-2.0-flash-001
+  description: gemini-2.0-flash-lite (THG)
+  model: gemini-2.0-flash-lite
   prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
   provider: thg
   settings:
     max_tokens: 75
     temperature: 0.1
 
-gemini-2-flash-lite-thg:
+claude-sonnet-4-5-thg:
   deployment: local
-  description: gemini-2.0-flash-lite (THG)
-  model: gemini-2.0-flash-lite
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
+  description: claude sonnet 4.5 THG
+  model: vertex_ai/claude-sonnet-4-5
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (20-30 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
   provider: thg
   settings:
     max_tokens: 75

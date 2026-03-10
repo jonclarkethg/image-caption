@@ -2,11 +2,11 @@
 
 # Activate virtual environment
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "${SCRIPT_DIR}/.venv/bin/activate"
+source "${SCRIPT_DIR}/bin/activate"
 
 # Install dependencies if needed
 echo "Installing dependencies..."
-pip install -r "${SCRIPT_DIR}/requirements.txt"
+pip3 install -r "${SCRIPT_DIR}/requirements.txt"
 
 # Create temp directory if it doesn't exist
 mkdir -p "${SCRIPT_DIR}/temp"

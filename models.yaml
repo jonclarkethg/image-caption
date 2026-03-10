@@ -1,19 +1,35 @@
-gemini-2-flash-lite-thg:
-  deployment: local
-  description: gemini-2.0-flash-lite (THG)
-  model: gemini-2.0-flash-lite
-  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (10-20 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
-  provider: thg
-  settings:
-    max_tokens: 75
-    temperature: 0.1
-
-claude-sonnet-4-5-thg:
-  deployment: local
-  description: claude sonnet 4.5 THG
-  model: vertex_ai/claude-sonnet-4-5
+gemini-2.5-flash-lite:
+  description: Gemini 2.5 Flash Lite
+  model: gemini-2.5-flash-lite
   prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (20-30 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
-  provider: thg
   settings:
-    max_tokens: 75
+    max_output_tokens: 75
     temperature: 0.1
+  pricing:
+    input_per_million: 0.075
+    output_per_million: 0.30
+    cached_input_per_million: 0.01875
+
+gemini-2.5-flash:
+  description: Gemini 2.5 Flash
+  model: gemini-2.5-flash
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (20-30 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
+  settings:
+    max_output_tokens: 75
+    temperature: 0.1
+  pricing:
+    input_per_million: 0.15
+    output_per_million: 0.60
+    cached_input_per_million: 0.0375
+
+gemini-3.1-flash-lite-preview:
+  description: Gemini 3.1 Flash Lite Preview
+  model: gemini-3.1-flash-lite-preview
+  prompt: You are a helpful alt-text generator assisting visually impaired users. Generate a clear and concise caption (20-30 words) that highlights the most important subject and action. Focus only on essential details, avoiding unnecessary background elements. Use simple, everyday language and avoid overly descriptive or poetic words, and avoid website names.
+  settings:
+    max_output_tokens: 75
+    temperature: 0.1
+  pricing:
+    input_per_million: 0.25
+    output_per_million: 1.50
+    cached_input_per_million: 0.025

@@ -257,11 +257,29 @@ def generate_caption(image_path, model_config, context=None, prompt=None, debug=
             print(f"Error generating caption: {error_msg}")
         return {"caption": error_msg, "error": True}
 
+def resolve_image(image_source):
+    """Resolve an image source to a local file path.
+
+    Supports:
+        - file:///path/to/image.jpg — local file path
+        - http(s)://... — remote URL (downloaded to temp)
+
+    Returns:
+        tuple: (image_path, is_temporary) — is_temporary indicates if the file should be cleaned up
+    """
+    if image_source.startswith("file://"):
+        local_path = image_source[7:]  # strip file://
+        if not os.path.isfile(local_path):
+            raise ValueError(f"Local file not found: {local_path}")
+        return local_path, False
+    else:
+        return download_image(image_source), True
+
 def process_image_url(image_url, model_name, context=None, prompt=None, debug=False):
-    """Process an image from URL with the specified model.
+    """Process an image from a URL or local file path with the specified model.
 
     Args:
-        image_url (str): URL of the image to process
+        image_url (str): URL (http/https) or local path (file://) of the image
         model_name (str): Name of the model to use
         context (str, optional): Additional context for caption generation
         prompt (str, optional): Custom prompt override
@@ -278,7 +296,7 @@ def process_image_url(image_url, model_name, context=None, prompt=None, debug=Fa
 
     model_config = validate_model(model_name, models)
 
-    image_path = download_image(image_url)
+    image_path, is_temporary = resolve_image(image_url)
     small_image = resize_image(image_path)
 
     result = generate_caption(small_image, model_config, context, prompt, debug)
@@ -301,7 +319,7 @@ def process_image_url(image_url, model_name, context=None, prompt=None, debug=Fa
             response["cost"] = result["cost"]
 
     try:
-        if os.path.exists(image_path):
+        if is_temporary and os.path.exists(image_path):
             os.remove(image_path)
         if small_image != image_path and os.path.exists(small_image):
             os.remove(small_image)

@@ -1,4 +1,5 @@
 import os
+import ssl
 import requests
 import uuid
 from pathlib import Path
@@ -15,10 +16,30 @@ import config
 # Initialize google-genai client
 _client = None
 
+def _ssl_verify():
+    """Build the TLS verification setting for outbound google-genai (httpx) calls.
+
+    httpx ignores REQUESTS_CA_BUNDLE and SSL_CERT_FILE (unlike requests) and uses
+    certifi's bundle, which does not include corporate TLS-interception CAs such as
+    Netskope. Honour those variables explicitly, falling back to httpx's default.
+    """
+    for var in ("REQUESTS_CA_BUNDLE", "SSL_CERT_FILE"):
+        path = os.environ.get(var)
+        if path and os.path.isfile(path):
+            return ssl.create_default_context(cafile=path)
+    return True
+
 def get_client():
     global _client
     if _client is None:
-        _client = genai.Client(api_key=config.GOOGLE_API_KEY)
+        verify = _ssl_verify()
+        _client = genai.Client(
+            api_key=config.GOOGLE_API_KEY,
+            http_options=genai.types.HttpOptions(
+                client_args={"verify": verify},
+                async_client_args={"verify": verify},
+            ),
+        )
     return _client
 
 def is_valid_url(url):
